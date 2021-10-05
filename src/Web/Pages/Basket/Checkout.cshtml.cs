@@ -12,7 +12,10 @@ using Microsoft.eShopWeb.Web.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Microsoft.eShopWeb.Web.Pages.Basket
 {
@@ -60,7 +63,14 @@ namespace Microsoft.eShopWeb.Web.Pages.Basket
                 var updateModel = items.ToDictionary(b => b.Id.ToString(), b => b.Quantity);
                 await _basketService.SetQuantities(BasketModel.Id, updateModel);
                 await _orderService.CreateOrderAsync(BasketModel.Id, new Address("123 Main St.", "Kent", "OH", "United States", "44240"));
-                await _basketService.DeleteBasketAsync(BasketModel.Id);               
+                await _basketService.DeleteBasketAsync(BasketModel.Id);
+
+                var client = new HttpClient();
+                const string funcUrl = "https://sow-items-reserver.azurewebsites.net/api/reserve_item";
+                var requestMessage = new HttpRequestMessage(HttpMethod.Post, funcUrl);
+                var json = JsonConvert.SerializeObject(items);
+                requestMessage.Content = new StringContent(json, Encoding.UTF8, "application/json");
+                await client.SendAsync(requestMessage);
             }
             catch (EmptyBasketOnCheckoutException emptyBasketOnCheckoutException)
             {

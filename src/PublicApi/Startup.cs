@@ -1,3 +1,4 @@
+using System;
 using AutoMapper;
 using BlazorShared;
 using MediatR;
@@ -38,10 +39,10 @@ namespace Microsoft.eShopWeb.PublicApi
         public void ConfigureDevelopmentServices(IServiceCollection services)
         {
             // use in-memory database
-            ConfigureInMemoryDatabases(services);
+            //ConfigureInMemoryDatabases(services);
 
             // use real database
-            //ConfigureProductionServices(services);
+            ConfigureProductionServices(services);
         }
 
         public void ConfigureDockerServices(IServiceCollection services)
@@ -128,6 +129,8 @@ namespace Microsoft.eShopWeb.PublicApi
                                   });
             });
 
+            services.AddApplicationInsightsTelemetry();
+
             services.AddControllers();
             services.AddMediatR(typeof(CatalogItem).Assembly);
 
@@ -172,6 +175,7 @@ namespace Microsoft.eShopWeb.PublicApi
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

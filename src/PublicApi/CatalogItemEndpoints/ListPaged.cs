@@ -18,14 +18,17 @@ namespace Microsoft.eShopWeb.PublicApi.CatalogItemEndpoints
     {
         private readonly IAsyncRepository<CatalogItem> _itemRepository;
         private readonly IUriComposer _uriComposer;
+        private readonly IAppLogger<ListPaged> _logger;
         private readonly IMapper _mapper;
 
         public ListPaged(IAsyncRepository<CatalogItem> itemRepository,
             IUriComposer uriComposer,
+            IAppLogger<ListPaged> logger,
             IMapper mapper)
         {
             _itemRepository = itemRepository;
             _uriComposer = uriComposer;
+            _logger = logger;
             _mapper = mapper;
         }
 
@@ -42,6 +45,7 @@ namespace Microsoft.eShopWeb.PublicApi.CatalogItemEndpoints
 
             var filterSpec = new CatalogFilterSpecification(request.CatalogBrandId, request.CatalogTypeId);
             int totalItems = await _itemRepository.CountAsync(filterSpec, cancellationToken);
+            _logger.LogWarning("Total items: " + totalItems);
 
             var pagedSpec = new CatalogFilterPaginatedSpecification(
                 skip: request.PageIndex * request.PageSize,
